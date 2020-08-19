@@ -42,15 +42,16 @@ class MyStreamListener(tweepy.StreamListener):
         self.stored_data.append(df)
         self.batch += 1
 
-        if self.batch % 200 == 0:
+        if self.batch % 50 == 0:
             print(f"Iteration: {self.iteration}")
             to_write = pd.concat(self.stored_data)
-            to_write.to_csv(f"twitter_topic_modeling/data/raw/vaccine/{self.iteration}.csv")
+            to_write.to_csv(f"twitter_topic_modeling/data/raw/demconvention/{self.iteration}.csv")
             self.stored_data = []
             self.batch = 1
             self.iteration += 1
+            time.sleep(1)
 
-        time.sleep(0.25)
+
 
 
 def main():
@@ -70,7 +71,7 @@ def main():
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
 
     #myStream.sample()
-    myStream.filter(track=['vaccine'])
+    myStream.filter(track=['demconvention'])
 
 
 
