@@ -12,7 +12,7 @@ import tweepy
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 
-def gather_and_model_data(username='realDonaldTrump', n_count=20, no_topics=10, no_features=1000):
+def gather_and_model_data(username='realDonaldTrump', n_count=20, no_topics=3, no_features=100):
     auth = tweepy.OAuthHandler(os.getenv('TWITTER_API_KEY'), os.getenv('TWITTER_API_SECRET_KEY'))
     auth.set_access_token(os.getenv('TWITTER_ACCESS_TOKEN'), os.getenv('TWITTER_ACCESS_SECRET'))
     api = tweepy.API(auth)
@@ -41,14 +41,21 @@ def gather_and_model_data(username='realDonaldTrump', n_count=20, no_topics=10, 
         'nmf': nmf,
         'nmf_feature_names': tfidf_feature_names,
         'lda': lda,
-        'lda_tf_feature_names': tf_feature_names
+        'lda_feature_names': tf_feature_names
     }
 
 def display_topics(model, feature_names, no_top_words):
-    for topic_idx, topic in enumerate(model.components_):
-        print(f"Topic {topic_idx}")
-        print(" ".join([feature_names[i]
-                        for i in topic.argsort()[:-no_top_words - 1:-1]]))
+    return {
+        f"{topic_idx}": " ".join(
+            [
+                feature_names[i]
+                for i in topic.argsort()[: -no_top_words - 1 : -1]
+            ]
+        )
+        for topic_idx, topic in enumerate(model.components_)
+    }
+
+
 
 
 
