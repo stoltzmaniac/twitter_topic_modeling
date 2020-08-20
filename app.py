@@ -4,7 +4,7 @@ from flask import Flask
 import plotly.express as px
 import pandas as pd
 import dotenv
-from twitter_topic_modeling.models.model_topic import gather_and_model_data, display_topics
+from twitter_topic_modeling.models.model_topic import get_raw_data, clean_tweet
 
 dotenv.load_dotenv(dotenv.find_dotenv())
 
@@ -23,12 +23,20 @@ def home():
     return 'This is the start of something great!'
 
 
-@app.route('/<username>/<model_type>/<no_top_words>')
-def user_tweet_topics(username='realDonaldTrump', model_type="nmf", no_top_words=5):
-    model = gather_and_model_data(username)
-    return display_topics(model[model_type], f"{model_type}_feature_names", no_top_words)
+@app.route('/<username>/<n_tweets>/<return_type>')
+def user_tweets(username, n_tweets, return_type):
+    raw_data = get_raw_data(username, int(n_tweets))
 
+    if return_type == 'json':
+        return {i._json['id_str']: i._json for i in raw_data}
 
+    tweet_text_list = [clean_tweet(i._json['text']) for i in raw_data if not i.retweeted]
+
+    if return_type == 'list':
+        return {'data': tweet_text_list}
+
+    if return_type == 'text':
+        return {'data': " ".join(tweet_text_list)}
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5000)
