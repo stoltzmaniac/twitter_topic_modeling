@@ -9,3 +9,6 @@ Create requirements.txt
 heroku login
 
 heroku create scotts-app-is-baller
+
+heroku local
+
